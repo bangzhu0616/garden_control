@@ -15,6 +15,8 @@ heater = 27
 sensor = 4
 light_on_start = 10
 light_on_end = 16
+temperature_low_bound = 20
+temperature_high_bound = 23
 db_name = 'database.db'
 
 GPIO.setwarnings(False)
@@ -41,8 +43,8 @@ while True:
     light_should_on_now = light_on_start <= now_hour < light_on_end
 
     humidity, temperature = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
-    temperature_too_low = temperature < 15
-    temperature_too_high = temperature > 23
+    temperature_too_low = temperature < temperature_low_bound
+    temperature_too_high = temperature > temperature_high_bound
 
     light_status, heater_status = set_status(light_is_on,
                                              heater_is_on,
@@ -65,6 +67,8 @@ while True:
             c.execute('insert into heater_status (year, month, day, start_hour, start_minute, end_hour, end_minute) values (%s, %s, %s, %s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), '0', '0', str(now_hour), str(now_minute)))
         if heater_is_on and heater_status:
             c.execute('insert into heater_status (year, month, day, start_hour, start_minute) values (%s, %s, %s, %s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), '0', '0'))
+        if not heater_is_on and heater_status:
+            c.execute('insert into heater_status (year, month, day, start_hour, start_minute) values (%s, %s, %s, %s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), str(now_hour), str(now_minute)) )
     else:
         if not heater_is_on and heater_status:
             c.execute('insert into heater_status (year, month, day, start_hour, start_minute) values (%s, %s, %s, %s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), str(now_hour), str(now_minute)) )
