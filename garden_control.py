@@ -55,14 +55,14 @@ while True:
     except:
         pass
 
-    c.execute('insert into sensor_data values (%s, %s, %s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), str(now_hour), str(now_minute), '%.1f'%(temperature), '%.1f'%(humidity)))
+    c.execute('insert into sensor_data (year, month, day, hour, minute, temperature, humidity) values (%s, %s, %s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), str(now_hour), str(now_minute), '%.1f'%(temperature), '%.1f'%(humidity)))
     conn.commit()
 
     c.execute('select count(*) from heater_stat where year=%s and month=%s and day=%s' % (str(now_year), str(now_month), str(now_day)))
     count = cursor.fetchone()[0]
     if count == 0:
         if heater_is_on and not heater_status:
-            c.execute('insert into heater_status values (%s, %s, %s, %s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), '0', '0', str(now_hour), str(now_minute)))
+            c.execute('insert into heater_status (year, month, day, start_hour, start_minute, end_hour, end_minute) values (%s, %s, %s, %s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), '0', '0', str(now_hour), str(now_minute)))
         if heater_is_on and heater_status:
             c.execute('insert into heater_status (year, month, day, start_hour, start_minute) values (%s, %s, %s, %s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), '0', '0'))
     else:
@@ -77,8 +77,6 @@ while True:
     print("Temp={0:0.1f}C  Humidity={1:0.1f}%".format(temperature, humidity) + " Light_On=%s Heater_On=%s" % (str(light_status), str(heater_status)))
 
     time.sleep(300)
-
-
 
 
 
