@@ -9,7 +9,7 @@ import Adafruit_DHT
 
 from status import set_status
 
-with open('config') as fp:
+with open(os.path.dirname(os.path.abspath(__file__)) + '/config') as fp:
     config = [int(c) for c in fp.read().split(',')]
 
 light = 17
