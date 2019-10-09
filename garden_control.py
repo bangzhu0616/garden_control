@@ -64,14 +64,14 @@ while True:
     count = c.fetchone()[0]
     if count == 0:
         if heater_is_on and not heater_status:
-            c.execute('insert into heater_status (year, month, day, start_hour, start_minute, end_hour, end_minute) values (%s, %s, %s, %s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), '0', '0', str(now_hour), str(now_minute)))
+            c.execute('insert into heater_status (year, month, day, start_hour, start_minute, end_hour, end_minute) values (%s, %s, %s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), '0', '0', str(now_hour), str(now_minute)))
         if heater_is_on and heater_status:
-            c.execute('insert into heater_status (year, month, day, start_hour, start_minute) values (%s, %s, %s, %s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), '0', '0'))
+            c.execute('insert into heater_status (year, month, day, start_hour, start_minute) values (%s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), '0', '0'))
         if not heater_is_on and heater_status:
-            c.execute('insert into heater_status (year, month, day, start_hour, start_minute) values (%s, %s, %s, %s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), str(now_hour), str(now_minute)) )
+            c.execute('insert into heater_status (year, month, day, start_hour, start_minute) values (%s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), str(now_hour), str(now_minute)) )
     else:
         if not heater_is_on and heater_status:
-            c.execute('insert into heater_status (year, month, day, start_hour, start_minute) values (%s, %s, %s, %s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), str(now_hour), str(now_minute)) )
+            c.execute('insert into heater_status (year, month, day, start_hour, start_minute) values (%s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), str(now_hour), str(now_minute)) )
         if heater_is_on and not heater_status:
             c.execute('update heater_stat set end_hour=%s end_minute=%s where id=(select MAX(id) from heater_stat where year=%s and month=%s and day=%s)' % (str(now_hour), str(now_minute), str(now_year), str(now_month), str(now_day)))
     conn.commit()
