@@ -33,6 +33,7 @@ light_is_on = GPIO.input(light)
 heater_is_on = GPIO.input(heater)
 
 now = datetime.now()
+yesterday = now - datetime.timedelta(1)
 now_year = now.year
 now_month = now.month
 now_day = now.day
@@ -53,7 +54,7 @@ try:
     GPIO.output(light, light_status)
     GPIO.output(heater, heater_status)
 except:
-    pass
+    print("set light or heater status error")
 
 c.execute('insert into sensor_data (year, month, day, hour, minute, temperature, humidity) values (%s, %s, %s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), str(now_hour), str(now_minute), '%.1f'%(temperature), '%.1f'%(humidity)))
 conn.commit()
@@ -61,6 +62,11 @@ conn.commit()
 c.execute('select count(*) from heater_stat where year=%s and month=%s and day=%s' % (str(now_year), str(now_month), str(now_day)))
 count = c.fetchone()[0]
 if count == 0:
+    if heater_is_on:
+        try:
+            c.execute('update heater_stat set end_hour=%s, end_minute=%s where id=(select MAX(id) from heater_stat where year=%s and month=%s and day=%s)' % ('23', '59', str(yesterday.year), str(yesterday.month), str(yesterday.day)))
+        except:
+            print('set yesterday heater end time error')
     if heater_is_on and not heater_status:
         c.execute('insert into heater_stat (year, month, day, start_hour, start_minute, end_hour, end_minute) values (%s, %s, %s, %s, %s, %s, %s)' % (str(now_year), str(now_month), str(now_day), '0', '0', str(now_hour), str(now_minute)))
     if heater_is_on and heater_status:
