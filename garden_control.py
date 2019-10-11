@@ -57,20 +57,17 @@ c.execute('select count(*) from heater_stat where strftime("%Y-%m-%d", start_tim
 count = c.fetchone()[0]
 if count == 0:
     if heater_is_on:
-        try:
-            c.execute('select * from heater_stat where id=(select MAX(id) from heater_stat)')
-            current = c.fetchone()
-            diff = datetime(yesterday.year, yesterday.month, yesterday.day, 23, 59) - datetime.strptime(current[1], '%Y-%m-%dT%H:%M')
-            running = divmod(diff.total_seconds(), 60)[0] + 1
-            c.execute('update heater_stat set end_time="%s" where where id=(select MAX(id) from heater_stat)' % (yesterday.strftime('%Y-%m-%d:23:59')))
-        except:
-            print('set yesterday heater end time error')
+        c.execute('select * from heater_stat where id=(select MAX(id) from heater_stat)')
+        current = c.fetchone()
+        diff = datetime(yesterday.year, yesterday.month, yesterday.day, 23, 59) - datetime.strptime(current[1], '%Y-%m-%dT%H:%M')
+        running = divmod(diff.total_seconds(), 60)[0] + 1
+        c.execute('update heater_stat set end_time="%s" where where id=(select MAX(id) from heater_stat)' % (yesterday.strftime('%Y-%m-%dT23:59')))
     if heater_is_on and not heater_status:
         diff = datetime(now.year, now.month, now.day, now.hour, now.minute) - datetime(now.year, now.month, now.day, 0, 0)
         running = divmod(diff.total_seconds(), 60)[0]
-        c.execute('insert into heater_stat (start_time, end_time, running) values ("%s", "%s", %s)' % (now.strftime('%Y-%m-%d:00:00'), now.strftime('%Y-%m-%dT%H:%M'), str(diff)))
+        c.execute('insert into heater_stat (start_time, end_time, running) values ("%s", "%s", %s)' % (now.strftime('%Y-%m-%dT00:00'), now.strftime('%Y-%m-%dT%H:%M'), str(diff)))
     if heater_is_on and heater_status:
-        c.execute('insert into heater_stat (start_time) values ("%s")' % (now.strftime('%Y-%m-%d:00:00')))
+        c.execute('insert into heater_stat (start_time) values ("%s")' % (now.strftime('%Y-%m-%dT00:00')))
     if not heater_is_on and heater_status:
         c.execute('insert into heater_stat (start_time) values ("%s")' % (now.strftime('%Y-%m-%dT%H:%M')))
 else:
